@@ -1,0 +1,19 @@
+
+syntax = "proto3";
+
+package contactspb;
+
+option go_package = "/contactspb";
+
+message ContactsRequest {
+  repeated string number = 1;
+}
+
+message ContactsResponse {
+  string msg = 1;
+}
+
+service ContactsService {
+  rpc AddContacts(ContactsRequest) returns (ContactsResponse);
+  rpc RemoveContacts(ContactsRequest) returns (ContactsResponse);
+};

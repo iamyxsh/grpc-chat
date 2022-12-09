@@ -1,0 +1,74 @@
+version: "3.8"
+services:
+  auth:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: auth
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./auth:/go/src/github.com/iamyxsh/grpc-chat/auth
+      - ./kafka:/go/src/github.com/iamyxsh/grpc-chat/kafka
+  auth-db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: auth-db
+    ports:
+      - '5432:5432'
+    volumes:
+      - ../volumes/auth-db:/var/lib/postgresql/data
+
+  contacts:
+    build:
+      context: ./contacts
+      dockerfile: Dockerfile
+    container_name: contacts
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./contacts:/go/src/github.com/iamyxsh/grpc-chat/contacts
+      - ./kafka:/go/src/github.com/iamyxsh/grpc-chat/kafka
+  contacts-db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: contacts-db
+    ports:
+      - '5433:5432'
+    volumes:
+      - ../volumes/contacts-db:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    container_name: zookeeper
+    ports:
+      - "22181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+volumes:
+  auth-db:
+    driver: local

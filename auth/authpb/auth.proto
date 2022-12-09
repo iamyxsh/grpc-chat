@@ -1,0 +1,18 @@
+
+syntax = "proto3";
+
+package authpb;
+
+option go_package = "/authpb";
+
+message LoginRequest {
+  string number = 1;
+}
+
+message LoginResponse {
+  string msg = 1;
+}
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+};
