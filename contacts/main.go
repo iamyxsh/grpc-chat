@@ -1,24 +1,21 @@
 package main
 
 import (
-	"fmt"
 	pb "github.com/iamyxsh/grpc-chat/contacts/contactspb"
 	"github.com/iamyxsh/grpc-chat/contacts/db"
+	"github.com/iamyxsh/grpc-chat/contacts/interceptor"
 	"github.com/iamyxsh/grpc-chat/contacts/services"
+	"github.com/iamyxsh/grpc-chat/contacts/utils"
 	"github.com/iamyxsh/grpc-chat/kafka"
 	"google.golang.org/grpc"
 	"log"
 	"net"
 )
 
-func logging(msg string) {
-	fmt.Println(msg)
-}
-
 var addr string = "0.0.0.0:5002"
 
 func main() {
-	go kafka.ReadMsg("USER_LOGIN", logging)
+	go kafka.ReadMsg("USER_LOGIN", utils.SaveUser)
 
 	lis, err := net.Listen("tcp", addr)
 
@@ -29,7 +26,10 @@ func main() {
 	defer lis.Close()
 	log.Printf("Listening at %s\n", addr)
 
-	s := grpc.NewServer()
+	opts := []grpc.ServerOption{}
+	opts = append(opts, grpc.ChainUnaryInterceptor(interceptor.CheckHeaderInterceptor()))
+
+	s := grpc.NewServer(opts...)
 	pb.RegisterContactsServiceServer(s, &services.Server{})
 
 	pg := db.ReturnDB("5433")

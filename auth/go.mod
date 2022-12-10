@@ -6,6 +6,8 @@ require (
 	github.com/iamyxsh/grpc-chat/kafka v0.0.0
 )
 
+replace github.com/iamyxsh/grpc-chat/kafka => ../kafka
+
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -22,4 +24,3 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 )
 
-replace github.com/iamyxsh/grpc-chat/kafka => ../kafka

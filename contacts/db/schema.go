@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS contacts (
-    number VARCHAR(10) PRIMARY KEY NOT NULL UNIQUE,
-    contact VARCHAR(10) NOT NULL
+    number VARCHAR(10) NOT NULL,
+    contact VARCHAR(10) NOT NULL,
+    UNIQUE (number, contact)
 );
 `
