@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	BroadcastMessage(ctx context.Context, opts ...grpc.CallOption) (ChatService_BroadcastMessageClient, error)
+	GetMessages(ctx context.Context, in *GetMessagesRequest, opts ...grpc.CallOption) (ChatService_GetMessagesClient, error)
 }
 
 type chatServiceClient struct {
@@ -64,11 +65,44 @@ func (x *chatServiceBroadcastMessageClient) Recv() (*Message, error) {
 	return m, nil
 }
 
+func (c *chatServiceClient) GetMessages(ctx context.Context, in *GetMessagesRequest, opts ...grpc.CallOption) (ChatService_GetMessagesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ChatService_ServiceDesc.Streams[1], "/chatpb.ChatService/GetMessages", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &chatServiceGetMessagesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ChatService_GetMessagesClient interface {
+	Recv() (*Message, error)
+	grpc.ClientStream
+}
+
+type chatServiceGetMessagesClient struct {
+	grpc.ClientStream
+}
+
+func (x *chatServiceGetMessagesClient) Recv() (*Message, error) {
+	m := new(Message)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility
 type ChatServiceServer interface {
 	BroadcastMessage(ChatService_BroadcastMessageServer) error
+	GetMessages(*GetMessagesRequest, ChatService_GetMessagesServer) error
 	mustEmbedUnimplementedChatServiceServer()
 }
 
@@ -78,6 +112,9 @@ type UnimplementedChatServiceServer struct {
 
 func (UnimplementedChatServiceServer) BroadcastMessage(ChatService_BroadcastMessageServer) error {
 	return status.Errorf(codes.Unimplemented, "method BroadcastMessage not implemented")
+}
+func (UnimplementedChatServiceServer) GetMessages(*GetMessagesRequest, ChatService_GetMessagesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetMessages not implemented")
 }
 func (UnimplementedChatServiceServer) mustEmbedUnimplementedChatServiceServer() {}
 
@@ -118,6 +155,27 @@ func (x *chatServiceBroadcastMessageServer) Recv() (*Message, error) {
 	return m, nil
 }
 
+func _ChatService_GetMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetMessagesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ChatServiceServer).GetMessages(m, &chatServiceGetMessagesServer{stream})
+}
+
+type ChatService_GetMessagesServer interface {
+	Send(*Message) error
+	grpc.ServerStream
+}
+
+type chatServiceGetMessagesServer struct {
+	grpc.ServerStream
+}
+
+func (x *chatServiceGetMessagesServer) Send(m *Message) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // ChatService_ServiceDesc is the grpc.ServiceDesc for ChatService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -131,6 +189,11 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _ChatService_BroadcastMessage_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "GetMessages",
+			Handler:       _ChatService_GetMessages_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "chatpb/chat.proto",

@@ -27,6 +27,7 @@ func main() {
 	log.Printf("Listening at %s\n", addr)
 
 	s := grpc.NewServer()
+
 	pb.RegisterAuthServiceServer(s, &services.Server{})
 
 	pg := db.ReturnDB("5432")

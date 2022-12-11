@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	pb "github.com/iamyxsh/grpc-chat/auth/authpb"
 	"github.com/iamyxsh/grpc-chat/auth/db"
 	"github.com/iamyxsh/grpc-chat/auth/utils"
@@ -24,9 +25,10 @@ func (*Server) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginRespon
 		}
 
 		user.Create(pg)
-
-		kafka.ProduceMessage("USER_LOGIN", user.Number)
 	}
+
+	msg, _ := json.Marshal(user)
+	kafka.ProduceMessage("USER_LOGIN", string(msg))
 
 	token, err := utils.GenerateJWT(user.Number)
 	if err != nil {

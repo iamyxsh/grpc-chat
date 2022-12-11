@@ -2,8 +2,9 @@ package kafka
 
 import (
 	"context"
-	"github.com/segmentio/kafka-go"
 	"log"
+
+	"github.com/segmentio/kafka-go"
 )
 
 func ProduceMessage(topic string, msg string) {

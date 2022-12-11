@@ -8,8 +8,14 @@ message Message {
   string from = 1;
   string to = 2;
   string message = 3;
+  int64 timestamp = 4;
+}
+
+message GetMessagesRequest {
+  string user = 1;
 }
 
 service ChatService {
   rpc BroadcastMessage(stream Message) returns (stream Message){};
+  rpc GetMessages(GetMessagesRequest) returns (stream Message);
 }

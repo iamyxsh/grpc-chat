@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+
 	pb "github.com/iamyxsh/grpc-chat/contacts/contactspb"
 	"github.com/iamyxsh/grpc-chat/contacts/db"
 	"google.golang.org/grpc/metadata"
@@ -16,8 +16,6 @@ func (*Server) AddContacts(ctx context.Context, req *pb.ContactsRequest) (*pb.Co
 	if !ok {
 		return &pb.ContactsResponse{}, status.Error(1, "something went wrong")
 	}
-
-	fmt.Println(headers.Get("number"))
 
 	number := headers.Get("number")[0]
 

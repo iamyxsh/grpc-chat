@@ -11,6 +11,7 @@ import (
 
 func CheckHeaderInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+
 		headers, ok := metadata.FromIncomingContext(ctx)
 
 		if !ok {

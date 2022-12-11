@@ -2,15 +2,14 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/iamyxsh/grpc-chat/chat/db"
 	"log"
+
+	"github.com/iamyxsh/grpc-chat/chat/db"
 )
 
 func SaveUser(msg string) {
-	fmt.Println(msg)
 	user := db.User{}
-	err := json.Unmarshal([]byte(msg), user)
+	err := json.Unmarshal([]byte(msg), &user)
 
 	if err != nil {
 		log.Fatalln(err)

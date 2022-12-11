@@ -3,8 +3,9 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"github.com/segmentio/kafka-go"
 	"log"
+
+	"github.com/segmentio/kafka-go"
 )
 
 func ReadMsg(topic string, callback func(msg string)) {
@@ -12,7 +13,7 @@ func ReadMsg(topic string, callback func(msg string)) {
 		Brokers:   []string{"kafka:9092"},
 		Topic:     topic,
 		Partition: 0,
-		MinBytes:  10e3, // 10KB
+		MinBytes:  0,    // 10KB
 		MaxBytes:  10e6, // 10MB
 	})
 

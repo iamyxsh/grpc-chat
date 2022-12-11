@@ -15,7 +15,6 @@ import (
 var addr string = "0.0.0.0:5002"
 
 func main() {
-	go kafka.ReadMsg("USER_LOGIN", utils.SaveUser)
 
 	lis, err := net.Listen("tcp", addr)
 
@@ -35,7 +34,8 @@ func main() {
 	pg := db.ReturnDB("5433")
 	db.ExecSchema(pg, db.Schema)
 
-	//go kafka.CreateTopics()
+	go kafka.CreateTopics()
+	go kafka.ReadMsg("USER_LOGIN", utils.SaveUser)
 
 	defer s.Stop()
 	if err := s.Serve(lis); err != nil {

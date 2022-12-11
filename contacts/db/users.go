@@ -9,7 +9,7 @@ type User struct {
 func (u User) Create(db *sqlx.DB) {
 	tx := db.MustBegin()
 
-	tx.MustExec("INSERT INTO contacts (number) VALUES ($1) ON CONFLICT DO NOTHING", u.Number)
+	tx.MustExec("INSERT INTO users (number) VALUES ($1) ON CONFLICT DO NOTHING", u.Number)
 
 	tx.Commit()
 }
