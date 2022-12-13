@@ -1,7 +1,30 @@
+import { useEffect, useState } from "react"
+import LoginPage from "./login"
+
 export default function Home() {
+	const [contacts, setContacts] = useState<any[]>([])
+	const [isAndroid, setIsAndroid] = useState(true)
+
+	useEffect(() => {
+		const getContacts = async () => {
+			try {
+				// @ts-ignore
+				const contacts = await navigator.contacts.select(["name", "tel"], {
+					multiple: true,
+				})
+
+				setContacts(contacts)
+			} catch (err) {
+				setIsAndroid(false)
+				console.log("err", err)
+			}
+		}
+		getContacts()
+	}, [])
+
 	return (
-		<h1 className="text-3xl font-bold underline text-green-700">
-			Hello world!
-		</h1>
+		<div>
+			<LoginPage />
+		</div>
 	)
 }
